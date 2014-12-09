@@ -14,7 +14,8 @@ public class Core extends PApplet {
 	private static Core instance;
 	private static final long serialVersionUID = 1L;
 	private int width = 800, height = 800;
-	private int fps = 120;
+	private int fps = 120, actualfps;
+	private long fpsDrawingDelay = 1001;
 	private long t;
 	private QuadTree quadTree;
 	private ArrayList<Entity> objects;
@@ -85,7 +86,7 @@ public class Core extends PApplet {
 		for (int i = 0; i < objectsNum; i++) {
 			objects.get(i).setColor(100);
 		}
-		frame.setTitle("QuadTreeDemo");
+		frame.setTitle(actualfps + " QuadTreeDemo");
 		tempObjects.clear();
 
 		quadTree.clear();
@@ -99,7 +100,8 @@ public class Core extends PApplet {
 			for (Entity e : entities) {
 				e.setColor(250);
 			}
-			frame.setTitle("QuadTreeDemo: Need to check collision with only "
+			frame.setTitle(actualfps
+					+ " QuadTreeDemo: Need to check collision with only "
 					+ entities.size() + "/" + (objectsNum) + " objects.");
 		} else {
 			tempObjects.clear();
@@ -120,6 +122,11 @@ public class Core extends PApplet {
 		long now = millis();
 		long dt = millis() - t;
 		t = now;
+		fpsDrawingDelay+=dt;
+		if (fpsDrawingDelay > 500) {
+			actualfps = (int) (1000 / dt);
+			fpsDrawingDelay=0;
+		}
 
 		// handle input
 		input();
@@ -185,7 +192,7 @@ public class Core extends PApplet {
 
 		// E
 		if (keyCode == 69) {
-			int scale=rng.nextInt(3)+3;
+			int scale = rng.nextInt(3) + 3;
 			int w = rng.nextInt((int) (width / (Math.pow(2, scale))));
 			int h = rng.nextInt((int) (height / (Math.pow(2, scale))));
 			int x = rng.nextInt(width - w);
