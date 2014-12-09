@@ -137,7 +137,7 @@ public class Core extends PApplet {
 		// draw
 		background(50);
 
-		fill(60, 125);
+		fill(70,60,60, 125);
 		Entity e;
 		for (int i = 0; i < objectsNum; i++) {
 			stroke(objects.get(i).getColor());
