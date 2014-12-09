@@ -27,8 +27,8 @@ public class Core extends PApplet {
 		size(width, height);
 		t = millis();
 		frame.setTitle("QuadTreeDemo");
-		rng = new Random(657);
-		quadTree = new QuadTree(0, new Rectangle(0, 0, width, height), 10, 10);
+		rng = new Random();
+		quadTree = new QuadTree(0, new Rectangle(0, 0, width, height), 10, 5);
 		objects = new ArrayList<Entity>();
 		for (int i = 0; i < objectsNum; i++) {
 			int w = rng.nextInt(width / 16);
@@ -41,7 +41,6 @@ public class Core extends PApplet {
 			quadTree.insert(objects.get(i));
 		}
 
-		background(222);
 		noStroke();
 
 	}
@@ -69,7 +68,6 @@ public class Core extends PApplet {
 		frame.setTitle("QuadTreeDemo");
 		if (shouldColor) {
 			List<Entity> entities = quadTree.retrieve(mouseX, mouseY);
-			// List<Entity> entities = quadTree.retrieve(objects.get(30));
 			for (Entity e : entities) {
 				e.setColor(250);
 			}
@@ -93,7 +91,7 @@ public class Core extends PApplet {
 		// draw
 		background(50);
 
-		fill(60);
+		fill(60, 125);
 		Entity e;
 		for (int i = 0; i < objectsNum; i++) {
 			stroke(objects.get(i).getColor());

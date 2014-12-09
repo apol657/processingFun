@@ -118,19 +118,15 @@ public class QuadTree {
 			if (x < verticalMidpoint) {
 				if (y < horizontalMidpoint) {
 					index = 0;
-				} else {
+				} else if (y > horizontalMidpoint) {
 					index = 3;
 				}
-			} else {
+			} else if (x > verticalMidpoint) {
 				if (y < horizontalMidpoint) {
 					index = 1;
-				} else {
+				} else if (y > horizontalMidpoint) {
 					index = 2;
 				}
-			}
-			if (x == verticalMidpoint || y == horizontalMidpoint) {
-				System.out.println(x + " " + y + " level " + level);
-				index = -1;
 			}
 		}
 
