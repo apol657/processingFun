@@ -1,4 +1,5 @@
 package util;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,10 @@ public class QuadTree {
 					index = 2;
 				}
 			}
+			if (x == verticalMidpoint || y == horizontalMidpoint) {
+				System.out.println(x + " " + y + " level " + level);
+				index = -1;
+			}
 		}
 
 		return index;
@@ -225,6 +230,7 @@ public class QuadTree {
 	public QuadTree[] getChildren() {
 		return nodes;
 	}
+
 	public Entity getBounds() {
 		return bounds;
 	}

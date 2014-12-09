@@ -1,10 +1,11 @@
 package core;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import entities.Entity;
 import entities.Rectangle;
+
 import processing.core.PApplet;
 import util.QuadTree;
 
@@ -72,7 +73,8 @@ public class Core extends PApplet {
 			for (Entity e : entities) {
 				e.setColor(250);
 			}
-			frame.setTitle("QuadTreeDemo: Need to check collision with only "+entities.size()+"/"+(objectsNum)+" objects.");
+			frame.setTitle("QuadTreeDemo: Need to check collision with only "
+					+ entities.size() + "/" + (objectsNum) + " objects.");
 		}
 	}
 
