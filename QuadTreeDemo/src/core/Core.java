@@ -72,6 +72,9 @@ public class Core extends PApplet {
 					userY2), Math.max(userX, userX2) - Math.min(userX, userX2),
 					Math.max(userY, userY2) - Math.min(userY, userY2)));
 		}
+		if(mousePressed&& mouseButton == 37&&drawingUserRect){
+			drawingUserRect=false;
+		}
 	}
 
 	public void update(long dt) {
