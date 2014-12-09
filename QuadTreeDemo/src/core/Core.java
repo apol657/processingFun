@@ -185,8 +185,9 @@ public class Core extends PApplet {
 
 		// E
 		if (keyCode == 69) {
-			int w = rng.nextInt(width / 32);
-			int h = rng.nextInt(height / 32);
+			int scale=rng.nextInt(3)+3;
+			int w = rng.nextInt((int) (width / (Math.pow(2, scale))));
+			int h = rng.nextInt((int) (height / (Math.pow(2, scale))));
 			int x = rng.nextInt(width - w);
 			int y = rng.nextInt(height - h);
 			Rectangle r = new Rectangle(x, y, w, h);
