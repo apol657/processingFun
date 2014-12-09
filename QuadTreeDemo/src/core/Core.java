@@ -1,10 +1,11 @@
 package core;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import entities.Entity;
 import entities.Rectangle;
+
 import processing.core.PApplet;
 import util.QuadTree;
 
@@ -13,25 +14,30 @@ public class Core extends PApplet {
 	private static Core instance;
 	private static final long serialVersionUID = 1L;
 	private int width = 800, height = 800;
-	private int fps = 120;
+	private int fps = 120, actualfps;
+	private long fpsDrawingDelay = 1001;
 	private long t;
 	private QuadTree quadTree;
 	private ArrayList<Entity> objects;
-	private int objectsNum = 1000;
+	private ArrayList<Entity> tempObjects;
+	private int objectsNum = 500;
 	private Random rng;
 	private boolean shouldColor;
+	private boolean drawingUserRect;
+	private double userX, userY, userX2, userY2;
 
 	public void setup() {
 		instance = this;
 		size(width, height);
 		t = millis();
 		frame.setTitle("QuadTreeDemo");
-		rng = new Random(657);
-		quadTree = new QuadTree(0, new Rectangle(0, 0, width, height), 10, 10);
+		rng = new Random();
+		quadTree = new QuadTree(0, new Rectangle(0, 0, width, height), 5, 10);
 		objects = new ArrayList<Entity>();
+		tempObjects = new ArrayList<Entity>();
 		for (int i = 0; i < objectsNum; i++) {
-			int w = rng.nextInt(width / 16);
-			int h = rng.nextInt(height / 16);
+			int w = rng.nextInt(width / 32);
+			int h = rng.nextInt(height / 32);
 			int x = rng.nextInt(width - w);
 			int y = rng.nextInt(height - h);
 			Rectangle r = new Rectangle(x, y, w, h);
@@ -40,16 +46,31 @@ public class Core extends PApplet {
 			quadTree.insert(objects.get(i));
 		}
 
-		background(222);
 		noStroke();
 
 	}
 
 	public void input() {
-		if (mousePressed) {
+		if (mousePressed && mouseButton == 37) {
 			shouldColor = true;
 		} else {
 			shouldColor = false;
+		}
+		if (mousePressed && mouseButton == 39 && !drawingUserRect) {
+			userX = mouseX;
+			userY = mouseY;
+			drawingUserRect = true;
+		}
+		if (!mousePressed && drawingUserRect) {
+			userX2 = mouseX;
+			userY2 = mouseY;
+			drawingUserRect = false;
+
+			objectsNum++;
+
+			objects.add(new Rectangle(Math.min(userX, userX2), Math.min(userY,
+					userY2), Math.max(userX, userX2) - Math.min(userX, userX2),
+					Math.max(userY, userY2) - Math.min(userY, userY2)));
 		}
 	}
 
@@ -65,15 +86,35 @@ public class Core extends PApplet {
 		for (int i = 0; i < objectsNum; i++) {
 			objects.get(i).setColor(100);
 		}
-		frame.setTitle("QuadTreeDemo");
+		frame.setTitle(actualfps + " QuadTreeDemo");
+		tempObjects.clear();
+
+		quadTree.clear();
+		for (Entity e : objects) {
+			quadTree.insert(e);
+		}
+
 		if (shouldColor) {
-			List<Entity> entities = quadTree.retrieve(mouseX, mouseY);
-			// List<Entity> entities = quadTree.retrieve(objects.get(30));
+			List<Entity> entities = quadTree.retrieve(tempObjects, mouseX,
+					mouseY);
 			for (Entity e : entities) {
 				e.setColor(250);
 			}
-			frame.setTitle("QuadTreeDemo: Need to check collision with only "+entities.size()+"/"+(objectsNum)+" objects.");
+			frame.setTitle(actualfps
+					+ " QuadTreeDemo: Need to check collision with only "
+					+ entities.size() + "/" + (objectsNum) + " objects.");
+		} else {
+			tempObjects.clear();
+			for (Entity e : objects) {
+				for (Entity e2 : quadTree.retrieve(tempObjects, e)) {
+					if (e != e2 && e.collidesWith(e2)) {
+						e.setColor(250);
+						e2.setColor(250);
+					}
+				}
+			}
 		}
+
 	}
 
 	public void draw() {
@@ -81,6 +122,11 @@ public class Core extends PApplet {
 		long now = millis();
 		long dt = millis() - t;
 		t = now;
+		fpsDrawingDelay+=dt;
+		if (fpsDrawingDelay > 500) {
+			actualfps = (int) (1000 / dt);
+			fpsDrawingDelay=0;
+		}
 
 		// handle input
 		input();
@@ -91,7 +137,7 @@ public class Core extends PApplet {
 		// draw
 		background(50);
 
-		fill(60);
+		fill(70,60,60, 125);
 		Entity e;
 		for (int i = 0; i < objectsNum; i++) {
 			stroke(objects.get(i).getColor());
@@ -102,6 +148,14 @@ public class Core extends PApplet {
 		}
 
 		drawQuadTree(quadTree);
+		if (drawingUserRect) {
+			noStroke();
+			fill(160, 100, 150, 50);
+			rect((float) Math.min(userX, mouseX),
+					(float) Math.min(userY, mouseY),
+					(float) (Math.max(userX, mouseX) - Math.min(userX, mouseX)),
+					(float) (Math.max(userY, mouseY) - Math.min(userY, mouseY)));
+		}
 		noStroke();
 
 	}
@@ -121,13 +175,33 @@ public class Core extends PApplet {
 	}
 
 	public void mousePressed() {
-
+		println(mouseButton);
 	}
 
 	public void mouseReleased() {
 	}
 
 	public void keyPressed() {
+		println(keyCode);
+
+		// R
+		if (keyCode == 82) {
+			objects.clear();
+			objectsNum = 0;
+		}
+
+		// E
+		if (keyCode == 69) {
+			int scale = rng.nextInt(3) + 3;
+			int w = rng.nextInt((int) (width / (Math.pow(2, scale))));
+			int h = rng.nextInt((int) (height / (Math.pow(2, scale))));
+			int x = rng.nextInt(width - w);
+			int y = rng.nextInt(height - h);
+			Rectangle r = new Rectangle(x, y, w, h);
+			r.setColor(100);
+			objects.add(r);
+			objectsNum++;
+		}
 	}
 
 	public void keyReleased() {
